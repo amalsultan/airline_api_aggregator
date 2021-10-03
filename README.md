@@ -25,3 +25,7 @@ departureDate=2021-10-17
 
 or access http://localhost:4000/findCheapestOffer?origin=BER&destination=LHR&departureDate=2021-10-17
 
+## Extra Liberaries Used
+      {:httpoison, "~> 1.8"} #to send http request
+      {:sweet_xml, "~> 0.7.1"} #to parse xml data
+
