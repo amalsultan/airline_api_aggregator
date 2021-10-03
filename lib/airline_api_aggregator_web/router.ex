@@ -5,8 +5,9 @@ defmodule AirlineApiAggregatorWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/api", AirlineApiAggregatorWeb do
+  scope "/", AirlineApiAggregatorWeb do
     pipe_through :api
+    get "/findCheapestOffer", CheapestOfferController, :show
   end
 
   # Enables LiveDashboard only for development
