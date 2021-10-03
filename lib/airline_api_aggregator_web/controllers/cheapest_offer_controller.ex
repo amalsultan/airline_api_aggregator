@@ -14,4 +14,8 @@ defmodule AirlineApiAggregatorWeb.CheapestOfferController do
         json conn, %{error: %{details: message}}
     end
   end
+
+  def show(conn, _) do
+    json conn, %{error: %{details: "invalid parameters"}}
+  end
 end
