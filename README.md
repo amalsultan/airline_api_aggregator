@@ -5,14 +5,23 @@ To start your Phoenix server:
   * Setup the project with `mix setup`
   * Start Phoenix endpoint with `mix phx.server`
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
+## Environment Variables
+Please set api key as environment variables before accessing the api.
 
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
+we are using two api keys:
 
-## Learn more
+ba_api_key=YOUR_KEY  #For British Airways (BA)
 
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+afkl_api_key=YOUR_KEY #For Air France / KLM (AFKL)
+
+## API End Point
+To access findCheapestOffer api, send get request to http://localhost:4000/findCheapestOffer with parameters:
+
+origin=BER
+
+destination=LHR
+
+departureDate=2021-10-17
+
+or access http://localhost:4000/findCheapestOffer?origin=BER&destination=LHR&departureDate=2021-10-17
+
