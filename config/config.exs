@@ -7,6 +7,11 @@
 # General application configuration
 use Mix.Config
 
+config :api_aggregator,
+  data_providers: [
+    %{id: "BA" ,url: "https://test.api.ba.com/selling-distribution/AirShopping/V2", soap_action: "AirShoppingV01", content_type: "application/xml", api_key: System.get_env("ba_api_key")}
+    ]
+
 # Configures the endpoint
 config :airline_api_aggregator, AirlineApiAggregatorWeb.Endpoint,
   url: [host: "localhost"],
