@@ -7,7 +7,7 @@
 # General application configuration
 use Mix.Config
 
-config :api_aggregator,
+config :airline_api_aggregator,
   data_providers: [
     %{id: "BA" ,url: "https://test.api.ba.com/selling-distribution/AirShopping/V2", soap_action: "AirShoppingV01", content_type: "application/xml", api_key: System.get_env("ba_api_key")},
     %{id: "AFKL", url: "https://ndc-rct.airfranceklm.com/passenger/distribmgmt/001448v02/EXT", soap_action: "\"http://www.af-klm.com/services/passenger/ProvideAirShopping/airShopping\"", content_type: "text/xml", api_key: System.get_env("afkl_api_key")}

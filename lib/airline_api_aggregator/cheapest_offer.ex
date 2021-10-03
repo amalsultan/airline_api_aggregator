@@ -5,6 +5,9 @@ defmodule AirlineApiAggregator.CheapestOffer do
   require Logger
   import SweetXml
 
+  @doc """
+   Takes origin, destination and departure data as input. Then it fetches providers data from config file. Calls get_data/2 method asynchronously to send the api call to the given data providers one by one. It recieves the cheapest offer by each provider and then takes the minimum of all.
+  """
   @spec get_cheapest_offer(%{
           :departure_date => any,
           :destination => any,
@@ -12,13 +15,17 @@ defmodule AirlineApiAggregator.CheapestOffer do
           optional(any) => any
         }) :: %{airline: <<_::16>>, amount: 0}
   def get_cheapest_offer(%{origin: _origin, destination: _destination, departure_date: _departure_date} = args) do
-    Application.fetch_env!(:api_aggregator, :data_providers)
+    Application.fetch_env!(:airline_api_aggregator, :data_providers)
     |> Enum.map(fn data_provider -> Task.async(fn -> get_data(data_provider, args) end) end)
     |> Enum.map(fn task -> Task.await(task, 60000) end)
     |> Enum.filter(fn {status, _data} -> status == :ok end)
     |> get_minimum_offer()
   end
 
+  @doc """
+   Takes api arguments and provider data as input. This function has two implementations on the basis of data providers. One for AFKL and other for BA. It calls build_soap_request/2 to generate xml request. It uses appropriate headers,url and xml_request body to send post request to provider. which returns an xml response if request is sucessful. Response body is parsed to get the minium offer by provider.
+   In case of failed post request it returns error.
+  """
   @spec get_data(%{:api_key => any, :id => any, optional(any) => any}, any) ::
           {:error, :failed | :not_found} | {:ok, %{airline: <<_::16>>, amount: float}}
   def get_data(%{id: id, api_key: nil}, _args) do
@@ -60,6 +67,9 @@ defmodule AirlineApiAggregator.CheapestOffer do
        end
   end
 
+  @doc """
+   Takes provider id and request parameters as input. This function has different implementation for each provider. It concatinates request paramaters in request body
+  """
   @spec build_soap_request(<<_::16>>, %{
           :departure_date => any,
           :destination => any,
@@ -74,6 +84,9 @@ defmodule AirlineApiAggregator.CheapestOffer do
     "<S:Envelope xmlns:S=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns=\"http://www.iata.org/IATA/2015/00/2018.2/IATA_AirShoppingRQ\"><S:Header/><S:Body><IATA_AirShoppingRQ><Party><Participant><Aggregator><AggregatorID>NDCABT</AggregatorID><Name>NDCABT</Name></Aggregator></Participant><Recipient><ORA><AirlineDesigCode>AF</AirlineDesigCode></ORA></Recipient><Sender><TravelAgency><AgencyID>12345675</AgencyID><IATANumber>12345675</IATANumber><Name>nom</Name><PseudoCityID>PAR</PseudoCityID></TravelAgency></Sender></Party><PayloadAttributes><CorrelationID>5</CorrelationID><VersionNumber>18.2</VersionNumber></PayloadAttributes><Request><FlightCriteria><OriginDestCriteria><DestArrivalCriteria><IATALocationCode>#{destination}</IATALocationCode></DestArrivalCriteria><OriginDepCriteria><Date>#{departure_date}</Date><IATALocationCode>#{origin}</IATALocationCode></OriginDepCriteria><PreferredCabinType><CabinTypeName>ECONOMY</CabinTypeName></PreferredCabinType></OriginDestCriteria></FlightCriteria><Paxs><Pax><PaxID>PAX1</PaxID><PTC>ADT</PTC></Pax></Paxs></Request></IATA_AirShoppingRQ></S:Body></S:Envelope>"
   end
 
+  @doc """
+   Takes provider if and xml response data by the provider as input. It uses xpath to get all the price offers by the provider and returns minimum of all prices. The method has seperate implementation for both providers.
+  """
   @spec parse_response(<<_::16>>, any) ::
           {:error, :not_found} | {:ok, %{airline: <<_::16>>, amount: float}}
   def parse_response("BA"= id, data) do
